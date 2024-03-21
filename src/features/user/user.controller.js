@@ -1,16 +1,14 @@
 import UserModel from "./user.model.js";
 
 export default class UserController {
-  SignUp(req, res) {
+  signUp(req, res) {
     const { name, email, password, type } = req.body;
-    const user = UserModel.SignUp(name, email, password, type);
-    console.log('user: ', user);
+    const user = UserModel.signUp(name, email, password, type);
     res.status(201).send(user);
   }
 
-  Login(req, res) {
-    const result = UserModel.Login(req.body.email, req.body.password);
-    console.log("result: ", result);
+  login(req, res) {
+    const result = UserModel.login(req.body.email, req.body.password);
     if (!result) {
       return res.status(400).send("Incorrect Credentials");
     } else {
