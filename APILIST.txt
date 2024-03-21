@@ -4,3 +4,10 @@ Add a product - Done.
 Get one product - Done.
 Filter Product - Done.
 Rate product.
+Add items to cart
+Get items to cart
+Remove items to cart
+
+UserController
+SignUp - Email, Name, Password, TypeOfUser(customer, seller)
+Login - (Email, Password)
