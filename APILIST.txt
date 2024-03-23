@@ -9,5 +9,5 @@ Get items to cart
 Remove items to cart
 
 UserController
-SignUp - Email, Name, Password, TypeOfUser(customer, seller)
-Login - (Email, Password)
+SignUp - Email, Name, Password, TypeOfUser(customer, seller) - Done
+Login - (Email, Password) - Done

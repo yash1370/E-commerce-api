@@ -25,6 +25,11 @@ productController.getAllProducts
 );
 
 productRouter.post(
+    '/rate', 
+productController.rateProduct
+);
+
+productRouter.post(
     '/', 
 upload.single('imageUrl'), 
 productController.addProduct
