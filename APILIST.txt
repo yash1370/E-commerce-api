@@ -3,10 +3,10 @@ Get Products - Done.
 Add a product - Done.
 Get one product - Done.
 Filter Product - Done.
-Rate product.
-Add items to cart
-Get items to cart
-Remove items to cart
+Rate product. - Done.
+Add items to cart - Done.
+Get items to cart - Done.
+Remove items to cart - Done.
 
 UserController
 SignUp - Email, Name, Password, TypeOfUser(customer, seller) - Done
