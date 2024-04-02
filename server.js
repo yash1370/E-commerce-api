@@ -9,6 +9,7 @@ import jwtAuth from "./src/middlewares/jwt.middleware.js";
 import cookieParser from "cookie-parser";
 import cartItemsRouter from "./src/features/cartItems/cartItems.routes.js";
 import apiDocs from "./swagger.json" assert { type: "json" };
+import { MongodbConnection } from "./src/config/mongodb.js";
 
 // 2. Create Server
 const server = express();
@@ -30,4 +31,5 @@ server.get("/", (req, res) => {
 // 4. Specify port.
 server.listen(3200, () => {
   console.log("Server is running at 3200");
+  MongodbConnection();
 });
