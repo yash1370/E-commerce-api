@@ -13,9 +13,8 @@ export default class UserController {
     res.status(201).send(user);
   }
 
-  async login(req, res, next) {
+  async login(req, res) {
     try {
-      console.log("first", req.body)
       const result = await this.userRepository.login(
         req.body.email,
         req.body.password
@@ -23,19 +22,13 @@ export default class UserController {
       if (!result) {
         return res.status(400).send("Incorrect Credentials");
       } else {
-        // 1. Create token.
+        // 1. create a token
         const token = jwt.sign(
-          {
-            userID: result.id,
-            email: result.email,
-          },
-          "AIb6d35fvJM4O9pXqXQNla2jBCH9kuLz",
-          {
-            expiresIn: "1h",
-          }
+          { userID: result.id, email: result.email },
+          "ejhefghdegvh",
+          { expiresIn: "1h" }
         );
-
-        // 2. Send token.
+        // 2. send the token
         return res.status(200).send(token);
       }
     } catch (err) {
