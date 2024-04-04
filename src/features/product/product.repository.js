@@ -1,50 +1,46 @@
+import { ObjectId } from "mongodb";
 import { getDb } from "../../config/mongodb.js";
 
-class UserRepository {
+class ProductRepository {
   constructor() {
-    this.collection = "users";
+    this.collection = "products";
   }
-
-  async signUp(newUser) {
+  async add(newProduct) {
     try {
       // 1. Get the database
       const db = getDb();
       // 2. Get the collection
       const collection = db.collection(this.collection);
-
       // 3. Insert the document.
-      await collection.insertOne(newUser);
-      return newUser;
+      await collection.insertOne(newProduct);
+      return newProduct;
     } catch (err) {
       console.log(err);
       throw new ApplicationError("Something went wrong with database", 500);
     }
   }
 
-  async login(email, password) {
+  async getAll() {
     try {
       // 1. Get the database
       const db = getDb();
       // 2. Get the collection
       const collection = db.collection(this.collection);
-
       // 3. Find the document.
-      return await collection.findOne({ email, password });
+      return await collection.find().toArray();
     } catch (err) {
       console.log(err);
       throw new ApplicationError("Something went wrong with database", 500);
     }
   }
-
-  async findByEmail(email) {
+  async get(id) {
     try {
       // 1. Get the database
       const db = getDb();
       // 2. Get the collection
       const collection = db.collection(this.collection);
-
       // 3. Find the document.
-      return await collection.findOne({ email });
+      return await collection.find({ _id: ObjectId(id) });
     } catch (err) {
       console.log(err);
       throw new ApplicationError("Something went wrong with database", 500);
@@ -52,4 +48,4 @@ class UserRepository {
   }
 }
 
-export default UserRepository;
+export default ProductRepository;
