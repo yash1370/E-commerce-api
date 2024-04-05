@@ -12,8 +12,14 @@ const cartItemsController = new CartItemsController();
 // localhost/api/products
 // localhost:4100/api/products/filter?minPrice=10&maxPrice=20&category=Category1
 
-cartItemsRouter.post("/", cartItemsController.add);
-cartItemsRouter.get("/", cartItemsController.get);
-cartItemsRouter.delete("/:id", cartItemsController.delete);
+cartItemsRouter.post("/", (req, res) => {
+  cartItemsController.add(req, res);
+});
+cartItemsRouter.get("/", (req, res) => {
+  cartItemsController.get(req, res);
+});
+cartItemsRouter.delete("/:id", (req, res) => {
+  cartItemsController.delete(req, res);
+});
 
 export default cartItemsRouter;
