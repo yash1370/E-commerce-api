@@ -73,14 +73,59 @@ class ProductRepository {
     }
   }
 
+  // async rate(userId, productId, rating) {
+  //   try {
+  //     const db = getDb();
+  //     const collection = db.collection(this.collection);
+  //     //  1. Find the product
+  //     const product = await collection.findOne({
+  //       _id: new ObjectId(productId),
+  //     });
+  //     //  2. Find the rating
+  //     const userRating = product?.ratings?.find((r) => r.userId == userId);
+  //     if (userRating) {
+  //       //  3. Update the rating
+  //       await collection.updateOne(
+  //         {
+  //           _id: new ObjectId(productId),
+  //           "ratings.userId": new ObjectId(userId),
+  //         },
+  //         {
+  //           $set: {
+  //             "ratings.$.rating": rating,
+  //           },
+  //         }
+  //       );
+  //     } else {
+  //       await collection.updateOne(
+  //         { _id: new ObjectId(productId) },
+  //         {
+  //           $push: { ratings: { userId: new ObjectId(userId), rating } },
+  //         }
+  //       );
+  //     }
+  //   } catch (err) {
+  //     console.log(err);
+  //     throw new ApplicationError("Something went wrong with database", 500);
+  //   }
+  // }
+
   async rate(userId, productId, rating) {
     try {
       const db = getDb();
       const collection = db.collection(this.collection);
-      collection.updateOne(
+      //  1. Removes existing entry
+      await collection.updateOne(
         { _id: new ObjectId(productId) },
         {
-          $push: { rating: { userId: new ObjectId(userId), rating } },
+          $pull: { ratings: { userId: new ObjectId(userId) } },
+        }
+      );
+      //  2. add new entry
+      await collection.updateOne(
+        { _id: new ObjectId(productId) },
+        {
+          $push: { ratings: { userId: new ObjectId(userId), rating } },
         }
       );
     } catch (err) {

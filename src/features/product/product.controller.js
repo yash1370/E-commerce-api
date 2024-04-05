@@ -40,8 +40,8 @@ export default class ProductController {
     try {
       console.log("Hello inside rate product");
       const userId = req.userId;
-      const productId = req.query.productId;
-      const rating = req.query.rating;
+      const productId = req.body.productId;
+      const rating = req.body.rating;
       const error = await this.productRepository.rate(
         userId,
         productId,
