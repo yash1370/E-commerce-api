@@ -11,8 +11,8 @@ export default class CartItemsRepository {
       // 1 . Get the db.
       const db = getDb();
       const collection = db.collection(this.collection);
-      const id = await this.getNextCounter(db);
-      console.log('id: ', id);
+      // const id = await this.getNextCounter(db);
+      // console.log("id: ", id);
       //  find the document
       // either insert or update
       // Insertion
@@ -21,7 +21,8 @@ export default class CartItemsRepository {
           productID: new ObjectId(productId),
           userID: new ObjectId(userId),
         },
-        { $setOnInsert: { _id: id }, $inc: { quantity: quantity } },
+        // { $setOnInsert: { _id: id }, $inc: { quantity: quantity } },
+        { $inc: { quantity: quantity } },
         { upsert: true }
       );
     } catch (err) {
@@ -56,15 +57,15 @@ export default class CartItemsRepository {
     }
   }
 
-  async getNextCounter(db) {
-    const resultDocument = await db
-      .collection("counters")
-      .findOneAndUpdate(
-        { _id: "cartItemId" },
-        { $inc: { value: 1 } },
-        { returnDocument: "after" }
-      );
-    console.log("resultDocument: ", resultDocument);
-    return resultDocument.value.value;
-  }
+  // async getNextCounter(db) {
+  //   const resultDocument = await db
+  //     .collection("counters")
+  //     .findOneAndUpdate(
+  //       { _id: "cartItemId" },
+  //       { $inc: { value: 1 } },
+  //       { returnDocument: "after" }
+  //     );
+  //   console.log("resultDocument: ", resultDocument);
+  //   return resultDocument.value.value;
+  // }
 }

@@ -43,7 +43,7 @@ class ProductRepository {
     }
   }
 
-  async filterProduct(minPrice, maxPrice, category) {
+  async filterProduct(minPrice, categories) {
     try {
       const db = getDb();
       const collection = db.collection(this.collection);
@@ -53,19 +53,26 @@ class ProductRepository {
           $gte: parseFloat(minPrice),
         };
       }
-      if (maxPrice) {
-        console.log("first", maxPrice);
-        filterExpression.price = {
-          ...filterExpression.price,
-          $lte: parseFloat(maxPrice),
+      // if (maxPrice) {
+      //   console.log("first", maxPrice);
+      //   filterExpression.price = {
+      //     ...filterExpression.price,
+      //     $lte: parseFloat(maxPrice),
+      //   };
+      //   console.log("filterExpression.price: ", filterExpression.price);
+      // }
+      categories = JSON.parse(categories.replace(/'/g, '"'));
+      console.log("categories: ", categories);
+      if (categories) {
+        filterExpression = {
+          $or: [{ category: { $in: categories } }, filterExpression],
         };
-        console.log("filterExpression.price: ", filterExpression.price);
       }
-      if (category) {
-        filterExpression.category = category;
-      }
-      const filter = await collection.find(filterExpression).toArray();
-      console.log("filter: ", filter);
+      const filter = await collection
+        .find(filterExpression)
+        .project({ name: 1, price: 1, _id: 0, ratings: { $slice: 1 } })
+        .toArray();
+      // console.log("filter: ", filter);
       return filter;
     } catch (err) {
       console.log(err);
@@ -128,6 +135,27 @@ class ProductRepository {
           $push: { ratings: { userId: new ObjectId(userId), rating } },
         }
       );
+    } catch (err) {
+      console.log(err);
+      throw new ApplicationError("Something went wrong with database", 500);
+    }
+  }
+
+  async averageProductPricePerCategory() {
+    try {
+      const db = getDb();
+      return await db
+        .collection(this.collection)
+        .aggregate([
+          {
+            // stage 1: Get average price per category
+            $group: {
+              _id: "$category",
+              averagePrice: { $avg: "$price" },
+            },
+          },
+        ])
+        .toArray();
     } catch (err) {
       console.log(err);
       throw new ApplicationError("Something went wrong with database", 500);
