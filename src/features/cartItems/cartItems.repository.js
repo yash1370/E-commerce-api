@@ -11,11 +11,19 @@ export default class CartItemsRepository {
       // 1 . Get the db.
       const db = getDb();
       const collection = db.collection(this.collection);
-      await collection.insertOne({
-        productID: new ObjectId(productId),
-        userID: new ObjectId(userId),
-        quantity,
-      });
+      const id = await this.getNextCounter(db);
+      console.log('id: ', id);
+      //  find the document
+      // either insert or update
+      // Insertion
+      await collection.updateOne(
+        {
+          productID: new ObjectId(productId),
+          userID: new ObjectId(userId),
+        },
+        { $setOnInsert: { _id: id }, $inc: { quantity: quantity } },
+        { upsert: true }
+      );
     } catch (err) {
       console.log(err);
       throw new ApplicationError("Something went wrong with database", 500);
@@ -26,7 +34,7 @@ export default class CartItemsRepository {
     try {
       const db = getDb();
       const collection = db.collection(this.collection);
-      return await collection.find({ userId: new ObjectId(userId) }).toArray();
+      return await collection.find({ userID: new ObjectId(userId) }).toArray();
     } catch (err) {
       console.log(err);
       throw new ApplicationError("Something went wrong with database", 500);
@@ -39,12 +47,24 @@ export default class CartItemsRepository {
       const collection = db.collection(this.collection);
       const result = await collection.deleteOne({
         _id: new ObjectId(cartItemId),
-        userId: new ObjectId(userId),
+        userID: new ObjectId(userId),
       });
       return result.deletedCount > 0;
     } catch (err) {
       console.log(err);
       throw new ApplicationError("Something went wrong with database", 500);
     }
+  }
+
+  async getNextCounter(db) {
+    const resultDocument = await db
+      .collection("counters")
+      .findOneAndUpdate(
+        { _id: "cartItemId" },
+        { $inc: { value: 1 } },
+        { returnDocument: "after" }
+      );
+    console.log("resultDocument: ", resultDocument);
+    return resultDocument.value.value;
   }
 }
