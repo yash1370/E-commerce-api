@@ -11,6 +11,7 @@ import cookieParser from "cookie-parser";
 import cartItemsRouter from "./src/features/cartItems/cartItems.routes.js";
 import apiDocs from "./swagger.json" assert { type: "json" };
 import { MongodbConnection } from "./src/config/mongodb.js";
+import orderRouter from "./src/features/order/order.routes.js";
 
 // 2. Create Server
 const server = express();
@@ -20,6 +21,7 @@ server.use(cookieParser());
 // for all requests related to product, redirect to product routes.
 // localhost:3200/api/products
 server.use("/api-docs", swagger.serve, swagger.setup(apiDocs));
+server.use("/api/orders", jwtAuth, orderRouter);
 server.use("/api/products", jwtAuth, productRouter);
 server.use("/api/users", userRouter);
 server.use("/api/cartItems", jwtAuth, cartItemsRouter);
