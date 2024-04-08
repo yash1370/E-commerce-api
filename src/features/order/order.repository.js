@@ -6,6 +6,7 @@ export default class OrderRepository {
   constructor() {
     this.collection = "orders";
   }
+
   async placeOrder(userId) {
     try {
       const client = getClient();
@@ -13,17 +14,17 @@ export default class OrderRepository {
       const db = getDb();
       session.startTransaction();
       // 1. Get cartItems and calculate total amount.
-      const items = await this.getTotalAmount(userId);
-      const finalAmount = items.reduce(
+      const items = await this.getTotalAmount(userId, session);
+      const finalTotalAmount = items.reduce(
         (acc, item) => acc + item.totalAmount,
         0
       );
-      console.log("finalAmount", finalAmount);
+      console.log(finalTotalAmount);
 
       // 2. Create an order record.
       const newOrder = new OrderModel(
         new ObjectId(userId),
-        finalAmount,
+        finalTotalAmount,
         new Date()
       );
       await db.collection(this.collection).insertOne(newOrder, { session });
@@ -33,32 +34,38 @@ export default class OrderRepository {
         await db
           .collection("products")
           .updateOne(
-            { _id: item.productId },
+            { _id: item.productID },
             { $inc: { stock: -item.quantity } },
             { session }
           );
       }
-      throw new Error("something is wrong in place order");
+
+      throw new Error("Something is wrong in placeOrder");
       // 4. Clear the cart items.
-      await db
-        .collection("cartItems")
-        .deleteMany({ userId: new ObjectId(userId) }, { session });
+      await db.collection("cartItems").deleteMany(
+        {
+          userId: new ObjectId(userId),
+        },
+        { session }
+      );
+      return;
     } catch (err) {
       console.log(err);
-      return res.status(200).send("Something went wrong");
+      throw new ApplicationError("Something went wrong with database", 500);
     }
   }
+
   async getTotalAmount(userId, session) {
     const db = getDb();
     const items = await db
       .collection("cartItems")
       .aggregate(
         [
-          //  1. get cart items for the user
+          // 1. Get cart items for the user
           {
             $match: { userID: new ObjectId(userId) },
           },
-          //  2. get the products form products collection.
+          // 2. Get the products form products collection.
           {
             $lookup: {
               from: "products",
@@ -67,11 +74,11 @@ export default class OrderRepository {
               as: "productInfo",
             },
           },
-          // 3. Unwind the product info.
+          // 3. Unwind the productinfo.
           {
             $unwind: "$productInfo",
           },
-          //  4. Calculate total amount for each cartItems.
+          // 4. Calculate totalAmount for each cartitems.
           {
             $addFields: {
               totalAmount: {
