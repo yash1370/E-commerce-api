@@ -15,6 +15,7 @@ export default class OrderRepository {
       session.startTransaction();
       // 1. Get cartItems and calculate total amount.
       const items = await this.getTotalAmount(userId, session);
+      // const items = await this.getTotalAmount(userId);
       const finalTotalAmount = items.reduce(
         (acc, item) => acc + item.totalAmount,
         0
@@ -27,6 +28,7 @@ export default class OrderRepository {
         finalTotalAmount,
         new Date()
       );
+      // await db.collection(this.collection).insertOne(newOrder);
       await db.collection(this.collection).insertOne(newOrder, { session });
 
       // 3. Reduce the stock.

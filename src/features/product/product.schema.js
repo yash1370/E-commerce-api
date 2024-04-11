@@ -8,13 +8,13 @@ export const productSchema = new mongoose.Schema({
   inStock: Number,
   reviews: [
     {
-      type: mongoose.Schema.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Review",
     },
   ],
   categories: [
     {
-      type: mongoose.Schema.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
     },
   ],
